@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.Data;
 using NZWalks.Models.Domain;
+using NZWalks.Models.DTO;
 
 namespace NZWalks.Controllers
 {
@@ -25,7 +26,7 @@ namespace NZWalks.Controllers
                 var regionDto = new Models.DTO.RegionDto
                 {
                     Id = region.Id,
-                    PresentationName = region.Name,
+                    Name = region.Name,
                     Code = region.Code,
                     RegionImageUrl = region.RegionImageUrl
                 };
@@ -50,13 +51,93 @@ namespace NZWalks.Controllers
                 var regionDto = new Models.DTO.RegionDto
                 {
                     Id = regionDomain.Id,
-                    PresentationName = regionDomain.Name,
+                    Name = regionDomain.Name,
                     Code = regionDomain.Code,
                     RegionImageUrl = regionDomain.RegionImageUrl
                 };
                 return Ok(regionDto);
             }
         }
-            
+
+        [HttpPost]
+        public IActionResult CreateRegion([FromBody] AddRegionRequestDto Arrd)
+        {
+            var RegionDomain = new Region
+            {
+                Name = Arrd.Name,
+                Code = Arrd.Code,
+                RegionImageUrl = Arrd.RegionImageUrl
+
+            };
+            dbContext.Regions.Add(RegionDomain);
+            dbContext.SaveChanges();
+
+            var RegionDto = new RegionDto
+            {
+                Id = RegionDomain.Id,
+                Name = RegionDomain.Name,
+                Code = RegionDomain.Code,
+                RegionImageUrl = RegionDomain.RegionImageUrl
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = RegionDto.Id }, RegionDto);
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateRegionReguestDto urrd)
+        {
+            var regionDomain = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomain == null)
+            {
+                return NotFound();
+            }
+
+            regionDomain.Name = urrd.Name;
+            regionDomain.Code = urrd.Code;
+            regionDomain.RegionImageUrl = urrd.RegionImageUrl;
+
+            dbContext.SaveChanges();
+
+            var RegionDto = new RegionDto
+            {
+                Id = regionDomain.Id,
+                Name = regionDomain.Name,
+                Code = regionDomain.Code,
+                RegionImageUrl = regionDomain.RegionImageUrl,
+            };
+
+            return Ok(RegionDto);
+        }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            var regionDomain = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomain == null)
+            {
+                return NotFound();
+            }
+
+            dbContext.Regions.Remove(regionDomain);
+            dbContext.SaveChanges();
+
+            var RegionDto = new RegionDto
+            {
+                Id = regionDomain.Id,
+                Name = regionDomain.Name,
+                Code = regionDomain.Code,
+                RegionImageUrl = regionDomain.RegionImageUrl,
+            };
+
+            return Ok(RegionDto);
+        }
+
+
+
+
     }
 }
