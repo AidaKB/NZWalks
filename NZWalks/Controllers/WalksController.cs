@@ -24,6 +24,13 @@ namespace NZWalks.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetAllWalks()
+        {
+            var walkDomain = await walkRepository.GetAllAsync();
+            return Ok(mapper.Map<List<WalkDto>>(walkDomain));
+        }
+
+        [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
@@ -48,6 +55,21 @@ namespace NZWalks.Controllers
             var walkDto = mapper.Map<WalkDto>(walkDomain);
 
             return CreatedAtAction(nameof(GetById), new { id = walkDto.Id }, walkDto);
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateWalk([FromRoute] Guid id, [FromBody] UpdateWalkRequestDto updateWalkRequestDto)
+        {
+            var walkDomain = mapper.Map<Walk>(updateWalkRequestDto);
+            walkDomain = await walkRepository.UpdateAsync(id, walkDomain);
+
+            if (walkDomain == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(mapper.Map<WalkDto>(walkDomain));
         }
 
     }
