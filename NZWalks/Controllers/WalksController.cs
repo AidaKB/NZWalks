@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NZWalks.CustomActionFilters;
 using NZWalks.Data;
 using NZWalks.Models.Domain;
 using NZWalks.Models.DTO;
@@ -45,46 +46,34 @@ namespace NZWalks.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateWalk([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
-            if (ModelState.IsValid)
-            {
-                var walkDomain = mapper.Map<Walk>(addWalkRequestDto);
+            
+            var walkDomain = mapper.Map<Walk>(addWalkRequestDto);
 
-                walkDomain = await walkRepository.CreateAsync(walkDomain);
+            walkDomain = await walkRepository.CreateAsync(walkDomain);
 
-                var walkDto = mapper.Map<WalkDto>(walkDomain);
+            var walkDto = mapper.Map<WalkDto>(walkDomain);
 
-                return CreatedAtAction(nameof(GetById), new { id = walkDto.Id }, walkDto);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            return CreatedAtAction(nameof(GetById), new { id = walkDto.Id }, walkDto);
 
         }
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> UpdateWalk([FromRoute] Guid id, [FromBody] UpdateWalkRequestDto updateWalkRequestDto)
         {
-            if (ModelState.IsValid)
-            {
-                var walkDomain = mapper.Map<Walk>(updateWalkRequestDto);
-                walkDomain = await walkRepository.UpdateAsync(id, walkDomain);
+            var walkDomain = mapper.Map<Walk>(updateWalkRequestDto);
+            walkDomain = await walkRepository.UpdateAsync(id, walkDomain);
 
-                if (walkDomain == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(mapper.Map<WalkDto>(walkDomain));
-            }
-            else
+            if (walkDomain == null)
             {
-                return BadRequest(ModelState);
+                return NotFound();
             }
 
+            return Ok(mapper.Map<WalkDto>(walkDomain));
         }
 
         [HttpDelete]
