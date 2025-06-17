@@ -1,4 +1,5 @@
-﻿using NZWalks.Models.Domain;
+﻿using Microsoft.AspNetCore.Mvc;
+using NZWalks.Models.Domain;
 
 namespace NZWalks.Repositories
 {
@@ -6,7 +7,7 @@ namespace NZWalks.Repositories
     {
         Task<Walk> CreateAsync(Walk walk);
         Task<Walk?> GetByIdAsync(Guid id);
-        Task<List<Walk>> GetAllAsync();
+        Task<List<Walk>> GetAllAsync(string? filterOn=null, string? filterQuery=null);
         Task<Walk?> UpdateAsync(Guid id, Walk walk);
         Task<Walk?> DeleteAsync(Guid id);
 
