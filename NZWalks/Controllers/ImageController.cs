@@ -7,5 +7,8 @@ namespace NZWalks.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
+        [HttpPost]
+        [Route("Upload")]
+        public async Task<IActionResult> Upload([FromForm])
     }
 }
